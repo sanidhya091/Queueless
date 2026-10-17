@@ -1,0 +1,32 @@
+node_modules/
+.expo/
+.env
+.env.*
+!.env.example
+dist/
+web-build/
+coverage/
+android/.gradle/
+android/build/
+android/app/build/
+ios/Pods/
+*.jks
+*.keystore
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Android signing keys
+android/app/debug.keystore
+*.jks
+*.keystore
+
+# Dependencies and generated files
+node_modules/
+.expo/
+coverage/
+
+# Local AI-tool configuration
+.claude/
