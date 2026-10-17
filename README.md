@@ -72,6 +72,26 @@ Do not run `prebuild --clean` if you need to preserve uncommitted native changes
 
 Required variable names are documented in `.env.example`. Never copy `.env` values into source, documentation, logs, or issue reports. Supabase publishable keys are intended for client use, but database access must still be protected by Supabase Row Level Security policies.
 
-## Docker
+## Docker checks
 
-There is intentionally no Dockerfile. Docker can provide a reproducible Node/Metro environment, but it cannot by itself provide the Android SDK, emulator/device, native graphics stack, or a useful mobile runtime. A Dockerfile claiming to build and run this Expo Android app would either be incomplete or require a large, machine-dependent Android toolchain setup. The reproducible local path is the pinned Node runtime, `npm ci`, and the checked-in Gradle/Android project; use a CI or EAS Android build environment for cloud builds.
+The repository includes a small checks-only Docker image. It uses Node.js 22.13.0 on Debian Bookworm slim, installs the lockfile exactly with `npm ci`, and copies only the source, configuration, and assets needed for verification. It does not copy `.env`, dependencies from the host, Android build output, or signing keys.
+
+Build and run the checks with:
+
+```bash
+docker build --tag queueless-checks .
+docker run --rm queueless-checks
+```
+
+The container runs, in order, `npm test`, `npm run lint`, and `npm run typecheck`; a failed command stops the container. It does not launch the Android app, provide an emulator, or build an APK. The checks do not require Supabase credentials because they do not run the app.
+
+## Android APK building
+
+Android development builds remain a native-host or CI/EAS concern. The checked-in `android/` project requires Java, the Android SDK (including the SDK level required by Expo SDK 57), Gradle, and an emulator or device for installation. Run the native development build outside the checks container:
+
+```bash
+npm ci
+npm run android
+```
+
+No Android SDK or emulator stage is included in the Dockerfile. Building an APK in Docker would require a separate, substantially larger Android builder image and has not been represented or verified here.
